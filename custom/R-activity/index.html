@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>R activity around the world</title>
+    <meta charset="utf-8">
+    <meta property="og:image" content="images/placeholder.png">
+    <meta property="og:title" content="R activity around the world" >
+    <meta property="og:description" content="Dynamic and colorful cartograms on the Web Index, sub-indexes and raw data with detailed tooltips and various distortion levels. These distorted maps shows the inequality of Internet access all over the world, even inside of Europe. It's really interesting to see the differences between various nations and how the technical infrastructure or the cultural issues look like.">
+    <link rel="stylesheet" href="css/select2/select2.css">
+    <link rel="stylesheet" href="css/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="css/d3.slider.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <script src="js/modernizr.custom.10703.js"></script>
+    <script src="js/d3.v3.min.js"></script>
+    <script src="js/colorbrewer.js"></script>
+    <script src="js/topojson.js"></script>
+    <script src="js/topojson.v1.min.js"></script>
+    <script src="js/cartogram.js"></script>
+    <script src="js/d3.tip.v0.6.3.js"></script>
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/ui/minified/jquery-ui.min.js"></script>
+    <script src="js/parsley.js"></script>
+    <script src="js/select2.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+  </head>
+  <body>
+
+    <div class="warning">
+      <strong>Not supported, deprecated, out-dated and insecure browser detected!</strong>
+      <p>Please install a modern browser of your choice to use this web application, e.g. visit <a href="http://abetterbrowser.org/">abetterbrowser.org</a>.</p>
+    </div>
+
+    <div id="header">
+      <div class="form-wrapper">
+        <div class="form">
+	  <div id="slider-container">
+	    <div class="label" title='More iterations result in more distorted maps at the cost of higher CPU load, so slower rendering times. Setting this value to one would return a "normal" map without any distortion.'>Number of iterations</div>
+            <div id="slider"></div>
+	  </div>
+	  <div id="dropdown-container">
+	    <div class="label short" title='Choose a variable to distort the world map by the relative size of the country-specific data. E.g. selecting the "Global score" highlights those countries with lwo  population and high R activity, while rendering countries with a low number of Internet users smaller than in real.'>Scale</div>
+            <div id="dropdown">
+              <select id="scale">
+		<option></option>
+		<optgroup label="Demography">
+		  <option value="default">Default scale</option>
+                  <option value="population">Population</option>
+                  <option value="land">Land territory (acres)</option>
+                  <option value="land_total">Land and water (acres)</option>
+		</optgroup>
+
+		<optgroup label="Population weighted global R scores">
+                  <option value="score">Global score</option>
+                  <option value="score_rfoundation">R Foundation members</option>
+                  <option value="score_user">useR! activity</option>
+                  <option value="score_meetup">RUG activity</option>
+                  <option value="score_cran">CRAN activity</option>
+                  <option value="score_rbloggers">R-bloggers visits</option>
+                  <option value="score_programmers">GitHub activity</option>
+                  <option value="score_search">Search activity</option>
+		</optgroup>
+
+		<optgroup label="R Foundation">
+                  <option value="rfoundation_Benefactors">Benefactors</option>
+                  <option value="rfoundation_Donors">Donors</option>
+                  <option value="rfoundation_Supporting-Institutions">Supporting institutions</option>
+                  <option value="rfoundation_Supporting-Members">Supporting members</option>
+                  <option value="rfoundation_Ordinary-Members">Ordinary members</option>
+		</optgroup>
+
+		<optgroup label="useR! attendees">
+                  <option value="user_2004">2004 (Austria)</option>
+                  <option value="user_2006">2006 (Austria)</option>
+                  <option value="user_2008">2008 (Germany)</option>
+                  <option value="user_2009">2009 (France)</option>
+                  <option value="user_2010">2010 (USA)</option>
+                  <option value="user_2011">2011 (UK)</option>
+                  <option value="user_2012">2012 (USA)</option>
+                  <option value="user_2013">2013 (Spain)</option>
+                  <option value="user_2014">2014 (Los Angeles)</option>
+		  <option value="user_2015">2015 (Denmark)</option>
+                  <option value="user_all">All time</option>
+		</optgroup>
+
+		<optgroup label="R User Groups">
+                  <option value="meetup_n">Number of R meetups</option>
+                  <option value="meetup_members">Number of members</option>
+		</optgroup>
+
+		<optgroup label="Package downloads">
+                  <option value="CRAN_all">All packages</option>
+                  <option value="CRAN_ggplot2">ggplot2</option>
+                  <option value="CRAN_devtools">devtools</option>
+                  <option value="CRAN_knitr">knitr</option>
+                  <option value="CRAN_RODBC">RODBC</option>
+                  <option value="CRAN_Rcmdr">Rcmdr</option>
+		</optgroup>
+
+		<optgroup label="Google Trends">
+                  <option value="gtrends_R">R</option>
+                  <option value="gtrends_CRAN">CRAN</option>
+                  <option value="gtrends_ggplot">ggplot</option>
+                  <option value="gtrends_R_graphics">R graphics</option>
+                  <option value="gtrends_R_books">R books</option>
+		</optgroup>
+
+		<optgroup label="Other R stats">
+                  <option value="github">GitHub users ratio</option>
+                  <option value="R-bloggers">R-bloggers visits</option>
+		</optgroup>
+
+              </select>
+            </div>
+	  </div>
+          <div class="button">OK</div>
+          <div id="logo">
+	    <div class="triangle-with-shadow"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="info-container">
+      <span id="status"></span>
+    </div>
+
+    <div id="variable-label"></div>
+    
+    <div id="info-button">
+      <a href="#" class="info">Information</a>
+    </div>
+
+    <div id="placeholder">
+      <img alt="Placeholder image for old browsers" src="images/placeholder.png">
+    </div>
+
+    <div id="container">
+
+      <div id="bg">
+	<svg id="background-map" width="1368" height="880" viewBox="0 0 1368 880" preserveAspectRatio="xMidYMid"></svg>
+      </div>
+
+      <div id="map-container">
+        <svg id="map" width="1368" height="880" viewBox="0 0 1368 880" preserveAspectRatio="xMidYMid"></svg>
+      </div>
+
+      <div id="about">
+	<h2>About<a href="#" class="btn close">X</a></h2>
+        <p>This project was inspired by "<a href="http://www.r-bloggers.com/where-is-the-r-activity/" target="_blank">Where is the R Activity?</a>" and my <a href="http://blog.rapporter.net/2013/11/the-attendants-of-user-2013-around-world.html" target="_blank">follow-up post on the number of useR! 2013 attandees</a>. But instead of static maps, now we gathered bunch of R-related data from a variety of different sources to create some interactive cartograms to highlight the focus of R activity from various points of view. <script type="text/javascript">document.write('<a href="mailto');document.write(':' + 'daroczig' + '@');document.write('rapporter.net">Feedback<\/A>');</script> is highly welcomed and please feel free to reach out on the social networks (<a target="_blank" href="http://about.me/daroczig">me</a>, <a target="_blank" href="http://linkedin.com/in/daroczig">LI</a>, <a target="_blank" href="http://plus.google.com/+GergelyDaróczi">G+</a>, <a target="_blank" href="http://github.com/daroczig">GH</a>) <em>with a message</em>.</p>
+	
+	<h3>Usage</h3>
+        <p>Please choose a variable from the list in the above menu (hover your mouse over the blue triangle) to render a distorted map of the world's countries. The label of the selected variable will be shown at the bottom of the page. The color on the map represents the high (blue) and low (red) values. Hover the mouse over any country to see some other related date.</p>
+
+	<h3>Methods</h3>
+	<p>Data was collected from from a variety of different sources (see the references below), and then merged to one dataset with <a target="_blank" href="http://r-project.org">R</a> after collecting, identifying, cleaning and standardizing the country names to (<a target="_blank" href="http://en.wikipedia.org/wiki/ISO_3166-1_numeric">ISO 3166-1 numeric</a>). The size of the distorted polygons (aka. <a target="_blank" href="http://en.wikipedia.org/wiki/Cartogram">cartogram</a>) reflects the relative size of the chosen scale for each country, where the power of distortion is based on the iterations set for the computations.</p>
+	<p>The general scores were computed by the sum of related values (like R Foundation members or all package downloads) divided by the population size multiplied by 1,000 to get the number of values per 1,000 people. The overall score represents the scaled mean of these values.</p>
+	
+	<h3>References</h3>
+	<ul>
+	  <li><a target="_blank" href="http://r-project.org">R</a> and a few user-contributed packages, like <a target="_blank" href="http://cran.r-project.org/web/packages/countrycode/index.html">countrycode</a>, <a target="_blank" href="http://cran.r-project.org/web/packages/XML/index.html">XML</a>, <a target="_blank" href="http://cran.r-project.org/web/packages/StandardizeText/index.html">StandardizeText</a> and <a target="_blank" href="http://cran.r-project.org/web/packages/data.table/index.html">data.table</a></li>
+	  <li><a target="_blank" href="http://d3js.org/">D3.js</a>, <a target="_blank" href="https://github.com/mbostock/topojson">TopoJSON</a> and <a target="_blank" href="https://github.com/shawnbot/d3-cartogram">d3-cartogram</a></li>
+	  <li>OpenGeoCode.Org (2012): <a target="_blank" href="http://opengeocode.org/download/cow.php">Countries of the World</a></li>
+	  <li>R Foundation members: <a href="http://www.r-project.org/foundation/memberlist.html" target="_blank">Members & Donors list</a> on the main <a href="http://www.r-project.org/" target="_blank">r-project.org</a> homepage.</li>
+	  <li>useR! attendees: the lists were publicly available on the <a href="http://www.r-project.org/conferences.html" target="_blank">conference homepages</a> (<a href="http://www.ci.tuwien.ac.at/Conferences/useR-2004/participants.html" target="_blank">2004</a>, <a href="http://www.r-project.org/useR-2006/participants.html" target="_blank">2006</a>, <a href="http://www.statistik.uni-dortmund.de/useR-2008//participants.html" target="_blank">2008</a>, <a href="http://www.r-project.org/conferences/useR-2010/participants.html" target="_blank">2010</a>, <a href="http://web.warwick.ac.uk/statsdept/useR-2011/participant-list.html" target="_blank">2011</a>, <a href="http://www.edii.uclm.es/~useR-2013//asistentes.html" target="_blank">2013</a>), in other cases (2009, 2012, 2014, 2015) the organizing committee kindly contributed the lists. 2007 is still missing.</li>
+	  <li>R User Groups: <a href="http://r-users-group.meetup.com/" target="_blank">meetup.com</a> search results.</li>
+	  <li>Package downloads: RStudio's <a href="http://cran-logs.rstudio.com/" target="_blank">logs</a> from the Cloud CRAN mirror</li>
+	  <li>Search queries were downloaded from <a href="https://www.google.com/trends/explore#q=%2Fm%2F0212jm%2C%20CRAN%2C%20ggplot%2C%20R%20graphics%2C%20R%20books&cmpt=q" target="_blank">Google Trends</a>.</li>
+	  <li>GitHub users were fetched from its wonderful <a href="https://developer.github.com/v3/" target="_blank">API</a>. </li>
+	  <li>And the number of visits at<a target="_blank" href="http://r-bloggers.com">R-bloggers.com</a> were kindly contributed by Tal Galili.</li>
+	</ul>
+
+	<h3>Sources</h3>
+	<p>This visualization was built by using open-source softwares and free data. The sources are available on request at this time, but will also be published without restrictions on <a target="_blank" href="https://github.com/daroczig">GitHub</a> as soon as I clean-up my project directory. Until then, please feel free to download the <a href="data/Rstats_2015.csv" target="_blank">compiled dataset</a>.</p>
+
+	  <div id="aboutlogo">
+	    <br />
+	    <a target="_blank" href="http://rapporter.net"><img src="http://rapporter.net/assets/powered-by.png" width="150px" alt="rapporter.net" title="This project was sponsored by Rapporter."></a>
+	  </div>
+      </div>
+    </div>
+
+    <div id="overlay">
+      <img src="images/spinner.gif" alt="spinner" />
+    </div>
+
+    <script src="js/custom.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-33690507-1', 'rapporter.net');
+      ga('require', 'displayfeatures');
+      ga('send', 'pageview',{'page': location.pathname + location.hash});
+    </script>
+
+    <div class="addthis_toolbox addthis_floating_style addthis_32x32_style" style="left:0px;bottom:0px;">
+      <a class="addthis_button_preferred_1"></a>
+      <a class="addthis_button_preferred_2"></a>
+      <a class="addthis_button_preferred_3"></a>
+      <a class="addthis_button_preferred_4"></a>
+      <a class="addthis_button_compact"></a>
+    </div>
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-52ef940e34da758e"></script>
+
+  </body>
+</html>
